@@ -15,7 +15,7 @@ cv::Mat fromMatrixOrFilename(Local<Value> v){
   cv::Mat im;
   if (v->IsString()){
     std::string filename = std::string(*NanAsciiString(v->ToString()));
-    im = cv::imread(filename);
+    im = cv::imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
     //std::cout<< im.size();
   } else {
     Matrix *img = ObjectWrap::Unwrap<Matrix>(v->ToObject());
@@ -173,7 +173,7 @@ Handle<Value> UnwrapTrainingData(_NAN_METHOD_ARGS_TYPE args, cv::vector<cv::Mat>
 	   int label = valarr->Get(0)->Uint32Value();
      cv::Mat im = fromMatrixOrFilename(valarr->Get(1));
      im = im.clone();
-     cv::cvtColor(im, im, CV_RGB2GRAY);
+     //cv::cvtColor(im, im, CV_RGB2GRAY);
      labels->push_back(label);
      images->push_back(im);
   }
@@ -188,9 +188,10 @@ NAN_METHOD(FaceRecognizerWrap::TrainSync){
   cv::vector<int> labels;
 
   Handle<Value> exception = UnwrapTrainingData(args, &images, &labels);
-  if (!exception->IsUndefined()){
-    NanReturnValue(exception);//FIXME: not too sure about returning exceptions like this
-  }
+  // FIXME
+  //if (!exception->IsUndefined()){
+  //  NanReturnValue(exception);//FIXME: not too sure about returning exceptions like this
+  //}
 
   self->rec->train(images, labels);
 
@@ -227,7 +228,7 @@ NAN_METHOD(FaceRecognizerWrap::PredictSync){
 	SETUP_FUNCTION(FaceRecognizerWrap)
 
   cv::Mat im = fromMatrixOrFilename(args[0]);//TODO CHECK!
-  cv::cvtColor(im, im, CV_RGB2GRAY);
+  //cv::cvtColor(im, im, CV_RGB2GRAY);
  // int predictedLabel = self->rec->predict(im);
 
   int predictedLabel = -1;
